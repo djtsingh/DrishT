@@ -1,14 +1,17 @@
 """
-SSD-VGG16 Configuration
-=========================
-Hyperparameters and paths for SSD-VGG16 text detection training.
+SSDLite-MobileNetV3 Configuration
+====================================
+Hyperparameters and paths for SSDLite text detection training.
+
+Model: SSDLite320 with MobileNetV3-Large backbone (torchvision built-in).
+Upgrade from SSD-VGG16: 3.4M params (down from 26M), mobile-optimized.
 """
 
 from pathlib import Path
 
 
 class SSDConfig:
-    """Configuration for SSD-VGG16 training."""
+    """Configuration for SSDLite-MobileNetV3 training."""
 
     # --- Paths ---
     DATA_DIR = Path("data/final/detection")
@@ -19,67 +22,61 @@ class SSDConfig:
     TEST_JSON = DATA_DIR / "test" / "annotations.json"
     TEST_IMAGES = DATA_DIR / "test" / "images"
 
-    CHECKPOINT_DIR = Path("models/ssd")
-    LOG_DIR = Path("runs/ssd")
+    CHECKPOINT_DIR = Path("models/detection")
+    LOG_DIR = Path("runs/detection")
 
     # --- Model ---
     NUM_CLASSES = 8          # 7 categories + background
-    INPUT_SIZE = 300         # SSD300 standard input
-    BACKBONE = "vgg16_bn"   # VGG16 with batch normalization
+    INPUT_SIZE = 320         # SSDLite320 native resolution
+    BACKBONE = "mobilenet_v3_large"
 
-    # Anchor box aspect ratios per feature map
-    ASPECT_RATIOS = [
-        [2],                 # conv4_3:  38×38
-        [2, 3],              # conv7:    19×19
-        [2, 3],              # conv8_2:  10×10
-        [2, 3],              # conv9_2:   5×5
-        [2],                 # conv10_2:  3×3
-        [2],                 # conv11_2:  1×1
-    ]
-
-    # Feature map sizes
-    FEATURE_MAPS = [38, 19, 10, 5, 3, 1]
-
-    # Default box scales (min_size, max_size) for each feature map
-    STEPS = [8, 16, 32, 64, 100, 300]
-    MIN_SIZES = [30, 60, 111, 162, 213, 264]
-    MAX_SIZES = [60, 111, 162, 213, 264, 315]
+    # Category mapping (matches build_detection_dataset.py)
+    CATEGORIES = {
+        0: "background",
+        1: "text",
+        2: "license_plate",
+        3: "traffic_sign",
+        4: "autorickshaw",
+        5: "tempo",
+        6: "truck",
+        7: "bus",
+    }
 
     # --- Training ---
-    BATCH_SIZE = 16          # Reduce to 4-8 for low-VRAM GPUs
+    BATCH_SIZE = 16          # MobileNetV3 is memory-efficient; 16 fits most GPUs
     NUM_WORKERS = 4
-    EPOCHS = 120
-    WARMUP_EPOCHS = 5
+    EPOCHS = 80              # Fewer epochs needed with strong pretrained backbone
+    WARMUP_EPOCHS = 3        # Warm up LR for the first few epochs
 
-    # Optimizer
-    LR = 1e-3
+    # Backbone freeze strategy
+    FREEZE_BACKBONE_EPOCHS = 5   # Freeze backbone for first N epochs
+
+    # Optimizer (SGD with momentum — standard for detection fine-tuning)
+    LR = 0.01
     MOMENTUM = 0.9
-    WEIGHT_DECAY = 5e-4
+    WEIGHT_DECAY = 4e-5      # Lighter regularization (MobileNet-style)
 
-    # LR schedule: cosine annealing
+    # LR schedule: cosine annealing with warm restarts
     LR_MIN = 1e-6
-
-    # Loss
-    NEG_POS_RATIO = 3        # Hard negative mining ratio
-    ALPHA = 1.0              # Localization loss weight
 
     # --- Augmentation ---
     AUGMENT_TRAIN = True
     COLOR_JITTER = 0.3
-    RANDOM_CROP_MIN_IOU = 0.3
+    RANDOM_HORIZONTAL_FLIP = 0.5
 
     # --- Evaluation ---
     NMS_THRESHOLD = 0.45
     CONFIDENCE_THRESHOLD = 0.5
     MAX_DETECTIONS = 200
+    IOU_THRESHOLD_MAP = 0.5  # IoU threshold for mAP computation
 
     # --- Early stopping ---
-    PATIENCE = 15
+    PATIENCE = 12
     MIN_DELTA = 0.001
 
     # --- Mixed precision ---
     USE_AMP = True
 
     # --- Checkpoint ---
-    SAVE_EVERY = 5           # Save checkpoint every N epochs
-    KEEP_LAST = 3            # Keep last N checkpoints
+    SAVE_EVERY = 5
+    KEEP_LAST = 3

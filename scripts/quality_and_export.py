@@ -252,12 +252,15 @@ def export_detection(det_data):
         split_img_ids = set(img["id"] for img in split_imgs)
         split_anns = [a for a in all_anns if a["image_id"] in split_img_ids]
 
-        # Copy images
+        # Link/copy images (hard link is instant on same drive)
         for img in tqdm(split_imgs, desc=f"  Copy {split_name} images"):
             src = det_img_dir / img["file_name"]
             dst = out_dir / img["file_name"]
             if src.exists() and not dst.exists():
-                shutil.copy2(src, dst)
+                try:
+                    os.link(src, dst)
+                except OSError:
+                    shutil.copy2(src, dst)
 
         coco = {
             "images": split_imgs,
@@ -322,9 +325,12 @@ def export_recognition(rec_records):
                     dst = out_dir / img_name
                     if not dst.exists():
                         try:
-                            shutil.copy2(full_path, dst)
-                        except Exception:
-                            continue
+                            os.link(full_path, dst)
+                        except OSError:
+                            try:
+                                shutil.copy2(full_path, dst)
+                            except Exception:
+                                continue
                 writer.writerow([img_name, rec["label"], rec.get("script", ""), rec.get("source", "")])
 
         stats[split_name] = {

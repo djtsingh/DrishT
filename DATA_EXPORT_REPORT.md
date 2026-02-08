@@ -2,21 +2,21 @@
 ## Detection Dataset
 | Split | Images | Annotations |
 |-------|--------|-------------|
-| train | 6555 | 35264 |
-| val | 817 | 4356 |
-| test | 817 | 4400 |
+| train | 7344 | 41174 |
+| val | 915 | 4730 |
+| test | 915 | 5094 |
 
 ## Recognition Dataset
 | Split | Total |
 |-------|-------|
-| train | 68881 |
-| val | 8600 |
-| test | 8600 |
+| train | 188879 |
+| val | 23601 |
+| test | 23601 |
 
 ### Script Distribution (Train)
 | Script | Count |
 |--------|-------|
-| latin | 10895 |
+| latin | 130897 |
 | odia | 7272 |
 | punjabi | 7166 |
 | bengali | 6496 |
@@ -29,7 +29,7 @@
 | urdu | 3484 |
 | kannada | 3324 |
 | hindi | 3320 |
-| latin_plate | 737 |
+| latin_plate | 733 |
 
 ## Output Structure
 ```

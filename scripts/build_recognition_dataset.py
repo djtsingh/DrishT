@@ -37,7 +37,9 @@ OUT = Path("data/processed/recognition")
 OUT_IMAGES = OUT / "images"
 VAL_RATIO = 0.10
 SEED = 42
-MAX_MJSYNTH = 500_000  # Cap MJSynth to keep dataset balanced
+MAX_MJSYNTH = 100_000  # Cap MJSynth — 100K covers the full 90K vocabulary with
+                       # redundancy for font/style diversity. More than enough for
+                       # Latin coverage without overwhelming the Indic data.
 
 # Recognition-focused: min word crop size
 MIN_CROP_W = 16

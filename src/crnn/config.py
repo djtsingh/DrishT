@@ -1,14 +1,18 @@
 """
-CRNN Configuration
-====================
-Hyperparameters and paths for CRNN text recognition training.
+CRNN-Light Configuration
+===========================
+Hyperparameters and paths for CRNN-Light text recognition training.
+
+Model: Lightweight CNN (depthwise sep + SE) + BiLSTM + CTC.
+Upgrade from basic 7-layer CNN: 2× smaller, faster inference,
+better accuracy on complex Indic scripts thanks to SE attention.
 """
 
 from pathlib import Path
 
 
 class CRNNConfig:
-    """Configuration for CRNN training."""
+    """Configuration for CRNN-Light training."""
 
     # --- Paths ---
     DATA_DIR = Path("data/final/recognition")
@@ -20,8 +24,8 @@ class CRNNConfig:
     TEST_IMAGES = DATA_DIR / "test" / "images"
     CHARSET_FILE = DATA_DIR / "charset.txt"
 
-    CHECKPOINT_DIR = Path("models/crnn")
-    LOG_DIR = Path("runs/crnn")
+    CHECKPOINT_DIR = Path("models/recognition")
+    LOG_DIR = Path("runs/recognition")
 
     # --- Model ---
     IMG_HEIGHT = 32           # Fixed input height
@@ -29,46 +33,45 @@ class CRNNConfig:
     NUM_CHANNELS = 1          # 1=grayscale, 3=RGB
     HIDDEN_SIZE = 256         # BiLSTM hidden size per direction
     NUM_LSTM_LAYERS = 2       # Number of BiLSTM layers
-    DROPOUT = 0.3             # Dropout between LSTM layers
+    DROPOUT = 0.3             # Dropout between LSTM layers + in CNN
 
-    # CNN backbone channel progression
-    # Input → 64 → 128 → 256 → 256 → 512 → 512 → 512
-    CNN_CHANNELS = [64, 128, 256, 256, 512, 512, 512]
+    # CNN: LightCNNEncoder channel progression
+    # Stage1: 32→64, Stage2: 128, Stage3: 256, Stage4: 384, Stage5: 512
+    # Uses depthwise separable convolutions + SE attention
 
     # --- Training ---
     BATCH_SIZE = 64           # Reduce to 16-32 for low-VRAM GPUs
     NUM_WORKERS = 4
-    EPOCHS = 100
+    EPOCHS = 80               # Fewer epochs with better backbone
     WARMUP_EPOCHS = 3
 
     # Optimizer
-    OPTIMIZER = "adam"        # "adam" or "adadelta"
-    LR = 1e-3                # Adam default; use 1.0 for Adadelta
+    OPTIMIZER = "adam"
+    LR = 1e-3
     WEIGHT_DECAY = 1e-5
-    BETAS = (0.9, 0.999)     # Adam betas
+    BETAS = (0.9, 0.999)
 
     # LR schedule
-    LR_SCHEDULER = "cosine"  # "cosine", "step", or "plateau"
-    LR_STEP_SIZE = 20        # For step scheduler
-    LR_GAMMA = 0.5           # For step scheduler
-    LR_MIN = 1e-6            # For cosine scheduler
+    LR_SCHEDULER = "cosine"
+    LR_STEP_SIZE = 20
+    LR_GAMMA = 0.5
+    LR_MIN = 1e-6
 
     # --- CTC ---
-    CTC_BLANK = 0             # CTC blank token index
-    DECODE_METHOD = "greedy"  # "greedy" or "beam"
-    BEAM_WIDTH = 10           # For beam search
+    CTC_BLANK = 0
+    DECODE_METHOD = "greedy"
+    BEAM_WIDTH = 10
 
     # --- Augmentation ---
     AUGMENT_TRAIN = True
-    RANDOM_ROTATION = 2       # Max rotation degrees
+    RANDOM_ROTATION = 2
     RANDOM_SCALE = (0.9, 1.1)
 
     # --- Evaluation ---
-    # Metrics: CER (Character Error Rate), WER (Word Error Rate), accuracy
-    EVAL_EVERY = 1            # Evaluate every N epochs
+    EVAL_EVERY = 1
 
     # --- Early stopping ---
-    PATIENCE = 15
+    PATIENCE = 12
     MIN_DELTA = 0.001
 
     # --- Mixed precision ---
