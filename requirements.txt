@@ -1,0 +1,18 @@
+# Core (lightweight) dependencies
+fiftyone
+opencv-python
+pillow
+numpy
+pandas
+matplotlib
+scikit-image
+tqdm
+albumentations
+onnx
+onnxruntime
+tf2onnx
+
+# Optional / Heavy (commented out). Uncomment to install when ready.
+# tensorflow==2.11.0
+# For PyTorch (CPU) use the recommended wheel from PyTorch's site. Example (Linux/Windows CPU):
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu

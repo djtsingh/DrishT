@@ -1,0 +1,80 @@
+# ============================================================
+# DrishT OCR Project — .gitignore
+# ============================================================
+
+# ----- Python -----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.egg-info/
+*.egg
+dist/
+build/
+eggs/
+*.whl
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ----- Virtual Environment -----
+.venv/
+venv/
+ENV/
+env/
+
+# ----- IDE / Editor -----
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# ----- OS Files -----
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.lnk
+
+# ----- Data (large files, raw datasets, processed outputs) -----
+data/raw/
+data/processed/
+data/final/
+data/crops/
+data/fonts/
+
+# ----- Model Weights (large binary files) -----
+models/*.pth
+models/*.pt
+models/*.onnx
+models/*.h5
+models/*.tflite
+models/*.pkl
+models/*.bin
+checkpoints/
+runs/
+wandb/
+
+# ----- Logs & Outputs -----
+*.log
+logs/
+output/
+results/
+
+# ----- Jupyter -----
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ----- Misc -----
+*.aria2
+*.part
+*.tmp
+*.bak
+
+# ----- Azure -----
+.azure/
+azureml-setup/
+azureml_artifacts/
