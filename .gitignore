@@ -74,6 +74,9 @@ results/
 *.tmp
 *.bak
 
+# ----- Kaggle upload (large zips) -----
+data/kaggle_upload/*.zip
+
 # ----- Azure -----
 .azure/
 azureml-setup/
