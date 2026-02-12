@@ -81,3 +81,4 @@ data/kaggle_upload/*.zip
 .azure/
 azureml-setup/
 azureml_artifacts/
+models/
