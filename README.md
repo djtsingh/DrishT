@@ -2,15 +2,25 @@
 
 > **दृष्ट** (DrishT) = "seen/observed" in Sanskrit
 
-An end-to-end OCR system designed for Indian scene text across 12+ scripts, 
-optimized for edge deployment on devices with limited compute.
+An end-to-end OCR system designed for Indian scene text across 12+ scripts.
+
+**Status**: v2.0 Excellence Roadmap in progress 🚀
 
 ## Architecture
 
-| Component | Model | Task |
-|-----------|-------|------|
-| **Detector** | SSD-VGG16 | Locate text, plates, signs, vehicles in scene images |
-| **Recognizer** | CRNN (CNN + BiLSTM + CTC) | Read Unicode text from cropped regions |
+### Current (v1) - Edge-Optimized
+| Component | Model | Task | Performance |
+|-----------|-------|------|-------------|
+| **Detector** | SSDLite-MobileNetV3 | Text localization | mAP 0.23 |
+| **Recognizer** | CRNN-Light | Unicode text recognition | CER 7.8% |
+
+### Target (v2) - Excellence Grade
+| Component | Model | Task | Target |
+|-----------|-------|------|--------|
+| **Detector** | DBNet++ (ResNet-50) | Scene text detection | mAP 0.85+ |
+| **Recognizer** | ViT-Transformer | Multi-script recognition | CER <2% |
+
+📖 See [docs/EXCELLENCE_ROADMAP.md](docs/EXCELLENCE_ROADMAP.md) for the full improvement plan.
 
 ## Quick Start
 
@@ -19,49 +29,35 @@ optimized for edge deployment on devices with limited compute.
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+pip install torch torchvision
 
-# Set encoding for Indic scripts (Windows)
-$env:PYTHONIOENCODING = "utf-8"
+# Run inference
+python -m inference.ocr_pipeline path/to/image.jpg
 
-# Run data pipeline (steps 1-4)
-python scripts/build_detection_dataset.py
-python scripts/build_recognition_dataset.py
-python scripts/generate_synthetic.py
-python scripts/quality_and_export.py
-
-# Train models (requires PyTorch + GPU)
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-python src/ssd/train.py
-python src/crnn/train.py
+# Or use programmatically
+from inference.ocr_pipeline import DrishTOCR
+ocr = DrishTOCR()
+results = ocr.process('image.jpg')
+for r in results:
+    print(f"{r.text} ({r.confidence:.2f})")
 ```
-
-## Dataset Summary
-
-- **Detection:** 9,174 images, 50,998 annotations (8 datasets)
-- **Recognition:** 400K+ word crops (MJSynth + IIIT5K + Indic Scene + synthetic)
-- **Scripts:** Hindi, Bengali, Tamil, Telugu, Gujarati, Kannada, Malayalam, 
-  Marathi, Odia, Punjabi, Assamese, Urdu, Latin
-
-## Documentation
-
-See [DOCUMENTATION.md](DOCUMENTATION.md) for comprehensive project docs including:
-- Architecture details & data flow
-- Step-by-step pipeline explanation
-- Model configurations
-- Azure training strategy
-- Known issues & resolutions
-
-## Cloud Training (Azure)
-
-Training uses Azure ML with low-priority GPU instances. Estimated cost: $6-15.
-See [misc/azure_resources.md](misc/azure_resources.md) for free tier analysis.
 
 ## Project Structure
 
 ```
-src/ssd/         — SSD-VGG16 model, config, training
-src/crnn/        — CRNN model, config, training
-scripts/         — Data pipeline (4 steps)
-fiftyone_scripts/ — Dataset visualization
-data/            — Raw, processed, and final datasets (not in Git)
+drisht/              — v2 models (DBNet++, ViT-Transformer)
+├── models/          — Detection & recognition architectures
+└── data/            — Indian text synthesizer
+inference/           — End-to-end pipeline
+notebooks/           — Kaggle training notebooks
+models/              — Trained weights (not in git)
+docs/                — Documentation & roadmaps
 ```
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [MODEL_ASSESSMENT.md](docs/MODEL_ASSESSMENT.md) | Honest evaluation of current models |
+| [EXCELLENCE_ROADMAP.md](docs/EXCELLENCE_ROADMAP.md) | Path to 0.85+ mAP, <2% CER |
+| [DOCUMENTATION.md](DOCUMENTATION.md) | Architecture & pipeline details |
