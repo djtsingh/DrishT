@@ -1,7 +1,5 @@
 # DrishT Model Assessment & Improvement Roadmap
 
-## Honest Results Summary
-
 ### Detection Model (SSDLite-MobileNetV3-Large)
 | Metric | Value | Production Target | Gap |
 |--------|-------|-------------------|-----|
